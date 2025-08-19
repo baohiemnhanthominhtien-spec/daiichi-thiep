@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Thiệp Kỷ Niệm Đồng Hành - Dai-ichi Life (Demo)</title>
+<style>
+  :root{
+    --brand-red: #d9252a;
+    --brand-gold: #f2c94c;
+    --bg-dark: #7b1f24;
+  }
+  html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+  body{background: linear-gradient(180deg, rgba(217,37,42,0.95) 0%, rgba(255,255,255,0.03) 60%), radial-gradient(circle at 10% 10%, rgba(255,255,255,0.06), transparent 20%); display:flex; align-items:center; justify-content:center; color:#222;}
+  .card{width:100%; max-width:900px; min-height:560px; background:linear-gradient(180deg,#fff 0%, #fff8f6 100%); border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.25); overflow:hidden; position:relative;}
+  header{height:140px; background: linear-gradient(90deg, rgba(217,37,42,1), rgba(242,201,76,1)); display:flex; align-items:center; gap:18px; padding:18px 28px; color:white;}
+  .logo{width:120px; display:flex; align-items:center; gap:12px; cursor:pointer; user-select:none;}
+  .logo .circle{width:64px; height:64px; border-radius:50%; background:var(--bg-dark); display:flex; align-items:center; justify-content:center; font-weight:700; color:white; font-size:20px; box-shadow:0 4px 14px rgba(0,0,0,0.25); transition:transform .25s, box-shadow .25s;}
+  .logo .text{font-size:18px; font-weight:700; line-height:1;}
+  .logo:hover .circle{transform:translateY(-4px); box-shadow:0 10px 26px rgba(0,0,0,0.35);}
+  .header-slogan{font-size:14px; opacity:0.95}
+  main{padding:28px; display:flex; gap:24px; align-items:stretch;}
+  .left{flex:1; position:relative; display:flex; align-items:center; justify-content:center;}
+  .right{width:340px; padding:18px 12px; display:flex; flex-direction:column; gap:12px;}
+  .card-title{font-size:24px; font-weight:800; color:var(--brand-red); margin:0 0 8px 0;}
+  .card-sub{font-size:15px; color:#555; margin:0 0 16px 0;}
+  .big-plate{width:420px; height:320px; border-radius:12px; background:linear-gradient(180deg,#fdf6f6, #fff); display:flex; align-items:center; justify-content:center; position:relative; overflow:visible; box-shadow:0 8px 30px rgba(0,0,0,0.12);}
+  .messages{position:absolute; bottom:12px; left:12px; right:12px; display:flex; gap:8px; flex-wrap:wrap;}
+  .msg-pill{background:rgba(0,0,0,0.06); padding:8px 12px; border-radius:999px; font-size:13px;}
+  .balloon{position:absolute; width:74px; height:100px; transform-origin:center bottom; cursor:pointer;}
+  .balloon .bubble{width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:14px; box-shadow:0 8px 22px rgba(0,0,0,0.18);}
+  .balloon .tail{width:2px; height:22px; background:rgba(0,0,0,0.06); margin:0 auto; transform:rotate(15deg); border-radius:2px;}
+  .key{position:absolute; bottom:20px; right:20px; width:64px; height:64px; border-radius:10px; background:linear-gradient(180deg,#fff,#ffd); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.14); cursor:pointer;}
+  .overlay-note{position:absolute; top:0; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; pointer-events:none;}
+  .note-box{pointer-events:auto; min-width:300px; max-width:86%; background:white; padding:16px 18px; border-radius:12px; box-shadow:0 18px 40px rgba(0,0,0,0.32); transform:translateY(12px); opacity:0; transition:all .28s; text-align:center;}
+  .note-box.show{opacity:1; transform:translateY(0);}
+  .note-box h3{margin:0 0 8px 0; color:var(--brand-red);}
+  .btn{display:inline-block; padding:8px 12px; border-radius:8px; background:var(--brand-red); color:white; cursor:pointer; margin-top:10px; text-decoration:none;}
+  /* confetti canvas */
+  #confetti-canvas{position:absolute; left:0; top:0; right:0; bottom:0; pointer-events:none; z-index:2;}
+  footer{height:56px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#666; background:linear-gradient(180deg, rgba(0,0,0,0.02), transparent);}
+  /* small responsiveness */
+  @media(max-width:880px){ main{flex-direction:column;} .right{width:100%;} .big-plate{width:90%;} }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <canvas id="confetti-canvas"></canvas>
+  <header>
+    <div class="logo" id="logo" title="Click để xem thông điệp">
+      <div class="circle" id="logoCircle">Đ</div>
+      <div class="text"><div style="font-size:14px">Dai-ichi Life</div><div class="header-slogan">Đồng hành - Trọn niềm tin</div></div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="text-align:right;">
+      <div style="font-weight:700">Chúc mừng kỷ niệm</div>
+      <div style="font-size:13px; opacity:0.95">Kỷ niệm 1 năm đồng hành</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="left">
+      <div class="big-plate" id="plate" aria-hidden="false">
+        <!-- SVG area -->
+        <svg width="420" height="320" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg" id="svgroot" style="overflow:visible;">
+          <defs>
+            <linearGradient id="gradBG" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0%" stop-color="#fff" stop-opacity="1"/>
+              <stop offset="100%" stop-color="#fff8f6" stop-opacity="1"/>
+            </linearGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background soft gradient circle -->
+          <rect x="0" y="0" width="420" height="320" fill="url(#gradBG)"/>
+          <circle cx="320" cy="80" r="68" fill="rgba(242,201,76,0.12)"/>
+          <circle cx="100" cy="80" r="88" fill="rgba(217,37,42,0.06)"/>
+
+          <!-- Cake graphic (clickable) -->
+          <g id="cake" transform="translate(130,140)" style="cursor:pointer;">
+            <rect x="-60" y="16" width="120" height="38" rx="8" fill="#ffe9e9" stroke="#f5c6c6"/>
+            <rect x="-52" y="-8" width="104" height="26" rx="6" fill="#ffd6d6"/>
+            <g id="candles">
+              <rect x="-20" y="-20" width="8" height="12" fill="#ffd54f"/>
+              <rect x="-6" y="-20" width="8" height="12" fill="#ffd54f"/>
+              <rect x="8" y="-20" width="8" height="12" fill="#ffd54f"/>
+              <g id="flame" transform="translate(-12,-26)">
+                <path d="M6 0 Q8 6 4 9 Q0 6 2 0 Z" fill="#ff8a00" />
+              </g>
+            </g>
+          </g>
+
+          <!-- Balloons (clickable) -->
+          <g id="balloons">
+            <g class="balloon" id="ball1" transform="translate(40,60)">
+              <circle class="bubble" r="36" fill="#f24a6b" cx="0" cy="0"/>
+            </g>
+            <g class="balloon" id="ball2" transform="translate(360,50)">
+              <circle class="bubble" r="36" fill="#ffb74d" cx="0" cy="0"/>
+            </g>
+            <g class="balloon" id="ball3" transform="translate(300,200)">
+              <circle class="bubble" r="36" fill="#6ec6ff" cx="0" cy="0"/>
+            </g>
+          </g>
+
+          <!-- Decorative hearts/flowers -->
+          <g id="decors">
+            <path d="M50 240 C48 230, 70 220, 80 230 C90 220, 110 230, 110 250 C110 270, 70 290, 50 240" fill="#ffdede" opacity="0.8"/>
+          </g>
+
+          <!-- Placeholder for name and message -->
+          <g id="textgroup" transform="translate(20,24)">
+            <text id="greeting" x="0" y="0" font-size="20" font-weight="700" fill="#d9252a">Xin cảm ơn Anh/Chị <tspan id="custName">[TÊN_KH]</tspan>!</text>
+            <text id="subg" x="0" y="30" font-size="14" fill="#555">Kỷ niệm 1 năm đồng hành cùng Dai-ichi Life</text>
+            <text id="dateLine" x="0" y="54" font-size="12" fill="#777">Ngày: <tspan id="cDate">[NGÀY_HỢP_ĐỒNG]</tspan></text>
+          </g>
+        </svg>
+
+        <div class="messages" id="messagesArea" aria-hidden="true"></div>
+        <div class="overlay-note" id="overlay" style="display:none;">
+          <div class="note-box" id="noteBox">
+            <h3 id="noteTitle">Lời nhắn</h3>
+            <p id="noteText">Cảm ơn Anh/Chị đã tin tưởng đồng hành cùng chúng tôi.</p>
+            <a class="btn" id="closeNote">Đóng</a>
+          </div>
+        </div>
+        <div class="key" id="keyBtn" title="Click xem lời nhắn từ tư vấn viên">🔑</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <h2 class="card-title">Kỷ niệm 1 năm đồng hành</h2>
+      <p class="card-sub">Trao niềm tin, giữ trọn hạnh phúc. Thiệp điện tử tương tác dành cho khách hàng trân quý.</p>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <div class="msg-pill">An tâm</div>
+        <div class="msg-pill">Thịnh vượng</div>
+        <div class="msg-pill">Hạnh phúc</div>
+        <div class="msg-pill">Sức khỏe</div>
+      </div>
+
+      <div style="margin-top:8px; display:flex; gap:8px;">
+        <a class="btn" id="openAll">Xem tất cả</a>
+        <a class="btn" id="sendLink" style="background:#4a90e2">Tạo link gửi</a>
+      </div>
+
+      <div style="margin-top:12px; font-size:13px; color:#444;">
+        <strong>Hướng dẫn nhanh:</strong>
+        <ul style="margin:8px 0 0 18px; padding:0; color:#555;">
+          <li>Click logo để xem slogan.</li>
+          <li>Click bong bóng để nhận lời chúc nhỏ.</li>
+          <li>Click bánh để xem hiệu ứng.</li>
+          <li>Click chìa khóa 🔑 để xem lời nhắn cá nhân từ tư vấn viên.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  <footer>
+    Thiệp điện tử bởi Tiến Trần Bảo Hiểm • Mẫu demo tương tác
+  </footer>
+</div>
+
+<script>
+// Personalization: edit these values or use URL params ?name=...&date=...
+const params = new URLSearchParams(location.search);
+const CUSTOMER_NAME = params.get('name') || 'Anh/Chị [Tên khách]';
+const CONTRACT_DATE = params.get('date') || 'DD/MM/YYYY';
+
+document.getElementById('custName').textContent = CUSTOMER_NAME;
+document.getElementById('cDate').textContent = CONTRACT_DATE;
+
+// Confetti canvas simple implementation
+const canvas = document.getElementById('confetti-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, confetti = [];
+
+function resizeCanvas(){ W = canvas.width = card.clientWidth; H = canvas.height = card.clientHeight; }
+const card = document.getElementById('card');
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function spawnConfetti(n=60){
+  confetti = [];
+  for(let i=0;i<n;i++){
+    confetti.push({
+      x: Math.random()*W,
+      y: Math.random()*-H/2,
+      r: Math.random()*8 + 4,
+      d: Math.random()*50+10,
+      color: ['#f2c94c','#fff','#d9252a','#ffb74d','#6ec6ff'][Math.floor(Math.random()*5)],
+      tilt: Math.random()*10,
+      tiltSpeed: Math.random()*0.05 + 0.01
+    });
+  }
+  runConfetti();
+}
+
+let confettiRunning = false;
+function runConfetti(){
+  confettiRunning = true;
+  function render(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<confetti.length;i++){
+      let p=confetti[i];
+      p.y += 2 + Math.sin(p.tilt) * 0.5;
+      p.x += Math.sin(p.tilt/2)*0.8;
+      p.tilt += p.tiltSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.tilt*0.07);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.6);
+      ctx.restore();
+      if(p.y > H + 50) p.y = -20;
+    }
+    if(confettiRunning) requestAnimationFrame(render);
+  }
+  render();
+  setTimeout(()=>{ confettiRunning=false; confetti=[]; ctx.clearRect(0,0,W,H); }, 6000);
+}
+
+// Logo click: glow & show slogan briefly
+const logoCircle = document.getElementById('logoCircle');
+const logo = document.getElementById('logo');
+logo.addEventListener('click', ()=>{
+  logoCircle.style.filter = 'drop-shadow(0 8px 20px rgba(242,201,76,0.6))';
+  logoCircle.style.transform = 'scale(1.1)';
+  showNote('Slogan', 'Gắn bó dài lâu — Dai-ichi Life');
+  setTimeout(()=>{ logoCircle.style.filter=''; logoCircle.style.transform=''; }, 1400);
+});
+
+// Balloons interactions
+const msgArea = document.getElementById('messagesArea');
+const notes = [
+  "An tâm - Chúng tôi luôn bên bạn",
+  "Thịnh vượng - Chúc gia đình an khang",
+  "Hạnh phúc - Niềm vui trọn vẹn",
+  "Sức khỏe - Luôn khỏe mạnh, vững bước"
+];
+function popBalloon(id){
+  const idx = Math.floor(Math.random()*notes.length);
+  const pill = document.createElement('div');
+  pill.className = 'msg-pill';
+  pill.textContent = notes[idx];
+  msgArea.appendChild(pill);
+  msgArea.style.opacity = 1;
+  // quick scale animation near balloon
+  const el = document.getElementById(id);
+  el.animate([{transform:'scale(1)'},{transform:'scale(0.1)'},{transform:'scale(0)'}], {duration:450, easing:'ease-out'});
+  setTimeout(()=>{ el.remove(); }, 480);
+}
+
+// Add event listeners to balloon groups
+['ball1','ball2','ball3'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=>{
+    popBalloon(id);
+  });
+});
+
+// Cake click: small sparkle effect + confetti
+const cake = document.getElementById('cake');
+if(cake) cake.addEventListener('click', ()=>{
+  spawnConfetti(80);
+  showNote('Chúc mừng!', 'Chúc Anh/Chị luôn an khang, thịnh vượng và an tâm khi đồng hành cùng Dai-ichi Life.');
+});
+
+// Key click -> show personal note (example)
+const keyBtn = document.getElementById('keyBtn');
+keyBtn.addEventListener('click', ()=>{
+  showNote('Lời nhắn từ tư vấn viên', 'Chúc mừng kỷ niệm 1 năm đồng hành. Cảm ơn Anh/Chị đã tin tưởng. — Tư vấn viên: Tiến Trần');
+});
+
+// Note overlay functions
+const overlay = document.getElementById('overlay');
+const noteBox = document.getElementById('noteBox');
+const noteTitle = document.getElementById('noteTitle');
+const noteText = document.getElementById('noteText');
+document.getElementById('closeNote').addEventListener('click', hideNote);
+
+function showNote(title, text){
+  noteTitle.textContent = title;
+  noteText.textContent = text;
+  overlay.style.display = 'flex';
+  setTimeout(()=> noteBox.classList.add('show'), 20);
+  // auto hide after 6 sec
+  clearTimeout(window._noteHide);
+  window._noteHide = setTimeout(hideNote, 6000);
+}
+
+function hideNote(){
+  noteBox.classList.remove('show');
+  setTimeout(()=> overlay.style.display='none', 300);
+}
+
+// "Open all" reveals all pills
+document.getElementById('openAll').addEventListener('click', ()=>{
+  msgArea.innerHTML='';
+  notes.forEach(n=>{ const pill=document.createElement('div'); pill.className='msg-pill'; pill.textContent=n; msgArea.appendChild(pill); });
+  msgArea.style.opacity=1;
+  spawnConfetti(80);
+});
+
+// "Create link" copies a shareable link with params
+document.getElementById('sendLink').addEventListener('click', ()=>{
+  const base = location.href.split('?')[0];
+  const share = base + '?name=' + encodeURIComponent(CUSTOMER_NAME) + '&date=' + encodeURIComponent(CONTRACT_DATE);
+  navigator.clipboard.writeText(share).then(()=>{
+    showNote('Link đã sao chép', 'Đã tạo link gửi cho khách hàng. Dán vào Zalo/Email để chia sẻ.');
+  }).catch(()=>{
+    showNote('Lỗi', 'Không thể sao chép tự động. Vui lòng copy thủ công: ' + share);
+  });
+});
+
+// Small floating animation for balloons
+function floatBalloons(){
+  ['ball1','ball2','ball3'].forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.animate([ {transform:'translateY(0) translateX(0)'}, {transform:'translateY(-8px) translateX(4px)'}, {transform:'translateY(0) translateX(0)'} ],
+      {duration:3000 + i*200, iterations: Infinity, direction:'alternate', easing:'ease-in-out'});
+  });
+}
+floatBalloons();
+
+// Accessibility: allow pressing Esc to close note
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideNote(); });
+
+// Quick demo confetti on load
+setTimeout(()=> spawnConfetti(60), 700);
+
+</script>
+</body>
+</html>
